@@ -59,7 +59,8 @@ app.post("/register", async (req, res) => {
       }
     );
     // save user token
-    user.token = token;
+    // user.tokens = user.tokens.concat({ token });
+    // await user.save();
 
     // redirect
     res.status(201).json({ redirect: "/" });
@@ -71,6 +72,7 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res, next) => {
   try {
+    console.log("req", req);
     // Get user input
     const { email, password } = req.body;
 
@@ -92,7 +94,9 @@ app.post("/login", async (req, res, next) => {
       );
 
       // save user token
-      user.token = token;
+      // user.token = token;
+      user.tokens = user.tokens.concat({ token });
+      await user.save();
 
       // redirect user
       // res.status(201).json({ redirect: "/" });
