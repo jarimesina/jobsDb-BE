@@ -4,7 +4,6 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 var cors = require("cors");
-const Job = require("./model/job");
 
 const User = require("./model/user");
 const jobRoutes = require("./routes/job");
@@ -72,7 +71,6 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res, next) => {
   try {
-    console.log("req", req);
     // Get user input
     const { email, password } = req.body;
 
@@ -116,7 +114,7 @@ app.get("/createdTasks", auth, async (req, res) => {
   // gets a user and populates it with jobs created with user
   const user = await User.findById({ _id: req.body.id });
   await user.populate("jobs");
-  // console.log(user.jobs);
+
   res.status(201).json({ jobs: user.jobs });
 });
 
