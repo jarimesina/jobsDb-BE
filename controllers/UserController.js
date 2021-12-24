@@ -1,6 +1,4 @@
 const User = require("../model/user.js");
-const fs = require("fs");
-const path = require("path");
 
 // function for getting user profile
 const getProfile = async (req, res, next) => {
