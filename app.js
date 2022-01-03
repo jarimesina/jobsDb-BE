@@ -50,13 +50,7 @@ app.post("/register", async (req, res) => {
     });
 
     // Create token
-    const token = jwt.sign(
-      { user_id: user._id, email },
-      process.env.TOKEN_KEY,
-      {
-        expiresIn: "2h",
-      }
-    );
+    const token = jwt.sign({ user_id: user._id, email }, process.env.TOKEN_KEY);
     // save user token
     // user.tokens = user.tokens.concat({ token });
     // await user.save();
@@ -85,10 +79,7 @@ app.post("/login", async (req, res, next) => {
       // Create token
       const token = jwt.sign(
         { user_id: user._id, email },
-        process.env.TOKEN_KEY,
-        {
-          expiresIn: "2h",
-        }
+        process.env.TOKEN_KEY
       );
 
       // save user token
