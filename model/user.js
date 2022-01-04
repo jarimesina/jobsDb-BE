@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
+const UserDetailsSchema = require("./userDetails");
+const CompanyDetailsSchema = require("./companyDetails");
 
 const userSchema = new mongoose.Schema({
-  first_name: { type: String, default: null },
-  last_name: { type: String, default: null },
   email: { type: String, unique: true },
   password: { type: String },
   tokens: [
@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  user_details: {type: UserDetailsSchema | CompanyDetailsSchema}
 });
 
 userSchema.virtual("jobs", {
