@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const jobSchema = new mongoose.Schema({
+  // TODO: remove companyName, move numberofEmployees to company details, add requirements
   companyName: { type: String, default: null },
   title: { type: String, default: null },
   responsibilities: { type: String, default: null },

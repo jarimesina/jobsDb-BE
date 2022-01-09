@@ -1,10 +1,8 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  first_name: { type: String, default: null },
-  last_name: { type: String, default: null },
-  email: { type: String, unique: true },
-  password: { type: String },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   tokens: [
     {
       token: {
@@ -13,6 +11,19 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  info: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    // Instead of a hardcoded model name in `ref`, `refPath` means Mongoose
+    // will look at the `onModel` property to find the right model.
+    refPath: "onModel",
+  },
+  infoModel: {
+    type: String,
+    required: true,
+    enum: ["companyDetail", "userDetail"],
+  },
+  role: { type: Number, required: true },
 });
 
 userSchema.virtual("jobs", {
