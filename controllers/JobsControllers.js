@@ -39,7 +39,7 @@ const newJob = async (req, res, next) => {
 
 const fetchJobs = async (req, res, next) => {
   try {
-    const queryResult = await Job.find({});
+    const queryResult = await Job.find({}).populate("owner");
     res.json({ data: queryResult });
   } catch (err) {
     console.log(err);
