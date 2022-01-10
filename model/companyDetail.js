@@ -6,6 +6,7 @@ const CompanyDetailsSchema = new mongoose.Schema({
   industry: { type: String, default: null },
   benefits: { type: String, default: null },
   image: { type: String, default: null },
+  numberOfEmployees: { type: String, default: null },
 });
 
 const CompanyDetail = mongoose.model("companyDetail", CompanyDetailsSchema);

@@ -61,7 +61,7 @@ const getProfile = async (req, res, next) => {
 const registerUser = async (req, res) => {
   try {
     // Get user input
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, isEmployer } = req.body;
 
     // Validate user input
     if (!(email && password && firstName && lastName)) {
@@ -88,7 +88,8 @@ const registerUser = async (req, res) => {
       email: email.toLowerCase(), // sanitize: convert email to lowercase
       password: encryptedPassword,
       info: company._id,
-      infoModel: "companyDetail",
+      infoModel: isEmployer ? "companyDetail" : "userDetail",
+      role: isEmployer ? 1 : 2, // 1 for normal user/employee and 2 for company/employer
     });
 
     // Create token
