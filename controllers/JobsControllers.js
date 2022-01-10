@@ -8,6 +8,7 @@ const newJob = async (req, res, next) => {
     companyName,
     title,
     responsibilities,
+    requirements,
     location,
     numberOfEmployees,
     languages,
@@ -19,6 +20,7 @@ const newJob = async (req, res, next) => {
     companyName,
     title,
     responsibilities,
+    requirements,
     location,
     numberOfEmployees,
     languages,
@@ -39,7 +41,13 @@ const newJob = async (req, res, next) => {
 
 const fetchJobs = async (req, res, next) => {
   try {
-    const queryResult = await Job.find({}).populate("owner");
+    const queryResult = await Job.find({}).populate({
+      path: "owner",
+      populate: {
+        path: "info",
+        model: "companyDetail",
+      },
+    });
     res.json({ data: queryResult });
   } catch (err) {
     console.log(err);
