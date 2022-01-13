@@ -1,6 +1,5 @@
 const Job = require("../model/job");
-const fs = require("fs");
-const path = require("path");
+const moment = require("moment");
 
 // newJob function for post job route
 const newJob = async (req, res, next) => {
@@ -41,14 +40,53 @@ const newJob = async (req, res, next) => {
 
 const fetchJobs = async (req, res, next) => {
   try {
-    const queryResult = await Job.find({}).populate({
-      path: "owner",
-      populate: {
-        path: "info",
-        model: "companyDetail",
-      },
-    });
-    res.json({ data: queryResult });
+    let query = {};
+    if (req.query.programmingLanguage) {
+      query.languages = req.query.programmingLanguage;
+    }
+
+    if (req.query.dateRange) {
+      if (req.query.dateRange === "today") {
+        const today = new Date();
+        const date =
+          today.getFullYear() +
+          "-" +
+          (today.getMonth() + 1) +
+          "-" +
+          today.getDate();
+
+        query.dateCreated = { $gte: date };
+      } else if (req.query.dateRange === "pastWeek") {
+        const startOfWeek = moment().clone().startOf("week");
+        const endOfWeek = moment().clone().endOf("week");
+
+        query.dateCreated = {
+          $gte: new Date(startOfWeek.toLocaleString()),
+          $lte: new Date(endOfWeek.toLocaleString()),
+        };
+      } else if (req.query.dateRange === "pastMonth") {
+        const startOfMonth = moment().clone().startOf("month");
+        const endOfMonth = moment().clone().endOf("month");
+
+        query.dateCreated = {
+          $gte: new Date(startOfMonth.toLocaleString()),
+          $lte: new Date(endOfMonth.toLocaleString()),
+        };
+      }
+    }
+
+    const queryResult = await Job.find(query)
+      .populate({
+        path: "owner",
+        populate: {
+          path: "info",
+          model: "companyDetail",
+        },
+      })
+      .skip(req.query.skip ? parseInt(req.query.skip) : 0)
+      .limit(req.query.limit ? parseInt(req.query.limit) : 10);
+    const total = await Job.find(query).count();
+    res.json({ data: { jobs: queryResult, total: total } });
   } catch (err) {
     console.log(err);
   }
