@@ -41,14 +41,18 @@ const newJob = async (req, res, next) => {
 
 const fetchJobs = async (req, res, next) => {
   try {
-    const queryResult = await Job.find({}).populate({
-      path: "owner",
-      populate: {
-        path: "info",
-        model: "companyDetail",
-      },
-    });
-    res.json({ data: queryResult });
+    const allJobs = await Job.find({});
+    const queryResult = await Job.find({})
+      .populate({
+        path: "owner",
+        populate: {
+          path: "info",
+          model: "companyDetail",
+        },
+      })
+      .skip(req.query.skip ? parseInt(req.query.skip) : 0)
+      .limit(req.query.limit ? parseInt(req.query.limit) : 10);
+    res.json({ data: { jobs: queryResult, total: allJobs.length } });
   } catch (err) {
     console.log(err);
   }
