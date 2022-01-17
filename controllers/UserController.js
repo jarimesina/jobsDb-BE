@@ -18,45 +18,50 @@ const getProfile = async (req, res, next) => {
   }
 };
 
-// const updateUser = async (req, res, next) => {
-//   try {
-//     const { _id, firstName, lastName } = req.body;
+const updateUser = async (req, res, next) => {
+  try {
+    const {
+      id,
+      company_name,
+      about,
+      benefits,
+      image,
+      industry,
+      numberOfEmployees,
+    } = req.body;
 
-//     // const {
-//     //   _id,
-//     //   companyName,
-//     //   title,
-//     //   responsibilities,
-//     //   location,
-//     //   numberOfEmployees,
-//     //   // languages,
-//     //   // image,
-//     // } = req.body;
+    const query = { _id: id };
 
-//     const query = { _id };
+    const user = await User.findOne(query);
 
-//     await User.findOneAndUpdate(
-//       query,
-//       {
-//         firstName,
-//         lastName,
-//       },
-//       (err, data) => {
-//         if (err) {
-//           res.json({ status: "500", message: "Error in updating job." });
-//         } else {
-//           res.json({
-//             status: "200",
-//             message: "Successfully updated the job!",
-//             data,
-//           });
-//         }
-//       }
-//     );
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
+    const temp = user.info;
+    await CompanyDetail.findOneAndUpdate(
+      { _id: temp },
+      {
+        company_name,
+        about,
+        benefits,
+        image,
+        industry,
+        numberOfEmployees,
+      },
+      (err, data) => {
+        if (err) {
+          res.json({ status: "500", message: "Error in updating job." });
+        } else {
+          console.log("success");
+          res.json({
+            status: "200",
+            message: "Successfully updated the job!",
+            data,
+          });
+        }
+      }
+    );
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const registerUser = async (req, res) => {
   try {
@@ -106,4 +111,4 @@ const registerUser = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, registerUser };
+module.exports = { getProfile, registerUser, updateUser };
