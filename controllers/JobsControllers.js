@@ -1,6 +1,18 @@
 const Job = require("../model/job");
 const moment = require("moment");
 
+const fetchCreatedJobs = async (req, res, next) => {
+  try {
+    const id = req.query.id;
+
+    const queryResult = await Job.find({ owner: id });
+
+    res.json({ data: queryResult });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 // newJob function for post job route
 const newJob = async (req, res, next) => {
   const {
@@ -176,4 +188,4 @@ const deleteJob = async (req, res, next) => {
   }
 };
 
-module.exports = { newJob, fetchJobs, editJob, deleteJob };
+module.exports = { newJob, fetchCreatedJobs, fetchJobs, editJob, deleteJob };
