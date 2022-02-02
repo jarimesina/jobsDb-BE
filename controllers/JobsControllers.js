@@ -1,5 +1,7 @@
 const Job = require("../model/job");
+const User = require("../model/user");
 const moment = require("moment");
+const UserDetail = require("../model/userDetails");
 
 const fetchCreatedJobs = async (req, res, next) => {
   try {
@@ -16,24 +18,20 @@ const fetchCreatedJobs = async (req, res, next) => {
 // newJob function for post job route
 const newJob = async (req, res, next) => {
   const {
-    companyName,
     title,
     responsibilities,
     requirements,
     location,
-    numberOfEmployees,
     languages,
     image,
     dateCreated,
   } = req.body;
 
   var job = new Job({
-    companyName,
     title,
     responsibilities,
     requirements,
     location,
-    numberOfEmployees,
     languages,
     image,
     dateCreated,
@@ -109,11 +107,11 @@ const editJob = async (req, res, next) => {
     // format data here
     const {
       _id,
-      companyName,
+      // companyName,
       title,
       responsibilities,
       location,
-      numberOfEmployees,
+      // numberOfEmployees,
       // languages,
       // image,
     } = req.body;
@@ -123,11 +121,11 @@ const editJob = async (req, res, next) => {
     await Job.findOneAndUpdate(
       query,
       {
-        companyName,
+        // companyName,
         title,
         responsibilities,
         location,
-        numberOfEmployees,
+        // numberOfEmployees,
       },
       (err, data) => {
         if (err) {
@@ -151,11 +149,11 @@ const deleteJob = async (req, res, next) => {
     // format data here
     const {
       _id,
-      companyName,
+      // companyName,
       title,
       responsibilities,
       location,
-      numberOfEmployees,
+      // numberOfEmployees,
       // languages,
       // image,
     } = req.body;
@@ -165,11 +163,11 @@ const deleteJob = async (req, res, next) => {
     await Job.findOneAndDelete(
       query,
       {
-        companyName,
+        // companyName,
         title,
         responsibilities,
         location,
-        numberOfEmployees,
+        // numberOfEmployees,
       },
       (err, data) => {
         if (err) {
@@ -188,4 +186,37 @@ const deleteJob = async (req, res, next) => {
   }
 };
 
-module.exports = { newJob, fetchCreatedJobs, fetchJobs, editJob, deleteJob };
+const addToSavedJobs = async (req, res, next) => {
+  try {
+    const { jobId, userId } = req.query;
+    const user = await User.findById({ _id: userId }).populate({
+      path: "info",
+      model: "userDetail",
+    });
+
+    if (!user.info.saved_jobs.includes(jobId)) {
+      const temp = await UserDetail.findById({ _id: user.info._id });
+
+      temp.saved_jobs.push(jobId);
+      await temp.save();
+
+      res.json({
+        status: "200",
+        message: "Successfully saved job!",
+      });
+    }
+
+    res.json({ status: "400", message: "Error in saving job." });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports = {
+  newJob,
+  fetchCreatedJobs,
+  fetchJobs,
+  editJob,
+  deleteJob,
+  addToSavedJobs,
+};

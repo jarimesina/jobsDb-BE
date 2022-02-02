@@ -1,10 +1,17 @@
 const mongoose = require("mongoose");
 
-const UserDetailsSchema = new mongoose.Schema({
-  first_name: { type: String, default: null },
-  last_name: { type: String, default: null },
-});
+const UserDetailsSchema = new mongoose.Schema(
+  {
+    first_name: { type: String, default: null },
+    last_name: { type: String, default: null },
+    saved_jobs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "job",
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
-const UserDetail = mongoose.model("userDetail", UserDetailsSchema);
-
-module.exports = UserDetail;
+module.exports = mongoose.model("userDetail", UserDetailsSchema);

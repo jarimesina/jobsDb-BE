@@ -14,4 +14,6 @@ router.post("/job", auth, jobController.newJob);
 router.put("/job", auth, jobController.editJob);
 router.delete("/job", auth, jobController.deleteJob);
 
+router.post("/saveJob", jobController.addToSavedJobs);
+
 module.exports = router; // export to use in server.js
