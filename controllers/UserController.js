@@ -8,10 +8,24 @@ const UserDetail = require("../model/userDetails");
 const getProfile = async (req, res, next) => {
   const token = req.headers.authorization.replace("Bearer ", "");
   try {
-    const queryResult = await User.findOne({ "tokens.token": token }).populate({
-      path: "info",
-      model: "companyDetail",
-    });
+    const user = await User.findOne({ "tokens.token": token });
+    let queryResult = null;
+
+    if (user.role === 1) {
+      queryResult = await User.findOne({ "tokens.token": token }).populate({
+        path: "info",
+        model: "userDetail",
+        populate: {
+          path: "saved_jobs",
+          model: "job",
+        },
+      });
+    } else {
+      queryResult = await User.findOne({ "tokens.token": token }).populate({
+        path: "info",
+        model: "companyDetail",
+      });
+    }
 
     res.json({ data: queryResult });
   } catch (err) {
