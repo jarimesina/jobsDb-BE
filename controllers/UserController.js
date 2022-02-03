@@ -2,15 +2,30 @@ const CompanyDetail = require("../model/companyDetail");
 const User = require("../model/user.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const UserDetail = require("../model/userDetails");
 
 // function for getting user profile
 const getProfile = async (req, res, next) => {
   const token = req.headers.authorization.replace("Bearer ", "");
   try {
-    const queryResult = await User.findOne({ "tokens.token": token }).populate({
-      path: "info",
-      model: "companyDetail",
-    });
+    const user = await User.findOne({ "tokens.token": token });
+    let queryResult = null;
+
+    if (user.role === 1) {
+      queryResult = await User.findOne({ "tokens.token": token }).populate({
+        path: "info",
+        model: "userDetail",
+        populate: {
+          path: "saved_jobs",
+          model: "job",
+        },
+      });
+    } else {
+      queryResult = await User.findOne({ "tokens.token": token }).populate({
+        path: "info",
+        model: "companyDetail",
+      });
+    }
 
     res.json({ data: queryResult });
   } catch (err) {
@@ -67,11 +82,12 @@ const registerUser = async (req, res) => {
   try {
     // Get user input
     const { firstName, lastName, email, password, isEmployer } = req.body;
+    let detail = null;
 
-    // Validate user input
-    if (!(email && password && firstName && lastName)) {
-      res.status(400).send("All input is required");
-    }
+    // validate user input in register
+    // if (!(email && password && firstName && lastName)) {
+    //   res.status(400).send("All input is required");
+    // }
 
     // check if user already exist
     // Validate if user exist in our database
@@ -84,17 +100,23 @@ const registerUser = async (req, res) => {
     //Encrypt user password
     encryptedPassword = await bcrypt.hash(password, 10);
 
-    const company = await CompanyDetail.create({});
+    // check if role is 1 or 2 then create the document accordingly
+    if (isEmployer == 1) {
+      detail = await UserDetail.create({
+        firstName,
+        lastName,
+      });
+    } else {
+      detail = await CompanyDetail.create({});
+    }
 
     // Create user in our database
     const user = await User.create({
-      firstName,
-      lastName,
       email: email.toLowerCase(), // sanitize: convert email to lowercase
       password: encryptedPassword,
-      info: company._id,
-      infoModel: isEmployer ? "companyDetail" : "userDetail",
-      role: isEmployer ? 1 : 2, // 1 for normal user/employee and 2 for company/employer
+      info: detail._id,
+      infoModel: isEmployer == 2 ? "companyDetail" : "userDetail",
+      role: isEmployer == 2 ? 2 : 1, // 1 for normal user/employee and 2 for company/employer
     });
 
     // Create token
