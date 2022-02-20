@@ -146,41 +146,21 @@ const editJob = async (req, res, next) => {
 
 const deleteJob = async (req, res, next) => {
   try {
-    // format data here
-    const {
-      _id,
-      // companyName,
-      title,
-      responsibilities,
-      location,
-      // numberOfEmployees,
-      // languages,
-      // image,
-    } = req.body;
+    const { id } = req.body;
 
-    const query = { _id };
+    const query = { _id: id };
 
-    await Job.findOneAndDelete(
-      query,
-      {
-        // companyName,
-        title,
-        responsibilities,
-        location,
-        // numberOfEmployees,
-      },
-      (err, data) => {
-        if (err) {
-          res.json({ status: "500", message: "Error in deleting job." });
-        } else {
-          res.json({
-            status: "200",
-            message: "Successfully deleted the job!",
-            data,
-          });
-        }
+    await Job.findOneAndDelete(query, (err, data) => {
+      if (err) {
+        res.json({ status: "500", message: "Error in deleting job." });
+      } else {
+        res.json({
+          status: "200",
+          message: "Successfully deleted the job!",
+          data,
+        });
       }
-    );
+    });
   } catch (err) {
     console.log(err);
   }

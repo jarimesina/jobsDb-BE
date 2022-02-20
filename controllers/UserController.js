@@ -33,6 +33,41 @@ const getProfile = async (req, res, next) => {
   }
 };
 
+const updateNormalUser = async (req, res, next) => {
+  try {
+    const { id, first_name, last_name, image } = req.body;
+
+    const query = { _id: id };
+
+    const user = await User.findOne(query);
+
+    const temp = user.info;
+
+    await UserDetail.findOneAndUpdate(
+      { _id: temp },
+      {
+        first_name,
+        last_name,
+        image,
+      },
+      (err, data) => {
+        if (err) {
+          res.json({ status: "500", message: "Error in updating job." });
+        } else {
+          console.log("success");
+          res.json({
+            status: "200",
+            message: "Successfully updated the job!",
+            data,
+          });
+        }
+      }
+    );
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const updateUser = async (req, res, next) => {
   try {
     const {
@@ -62,12 +97,12 @@ const updateUser = async (req, res, next) => {
       },
       (err, data) => {
         if (err) {
-          res.json({ status: "500", message: "Error in updating job." });
+          res.json({ status: "500", message: "Error in updating company." });
         } else {
           console.log("success");
           res.json({
             status: "200",
-            message: "Successfully updated the job!",
+            message: "Successfully updated the company!",
             data,
           });
         }
@@ -133,4 +168,4 @@ const registerUser = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, registerUser, updateUser };
+module.exports = { getProfile, registerUser, updateUser, updateNormalUser };
