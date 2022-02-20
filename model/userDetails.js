@@ -10,6 +10,7 @@ const UserDetailsSchema = new mongoose.Schema(
         ref: "job",
       },
     ],
+    image: { type: String, default: null },
   },
   { timestamps: true }
 );
