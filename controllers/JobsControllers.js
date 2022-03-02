@@ -192,6 +192,44 @@ const addToSavedJobs = async (req, res, next) => {
   }
 };
 
+const removeSavedJob = async (req, res, next) => {
+  try {
+    const { jobId, userId } = req.query;
+    const user = await User.findById({ _id: userId }).populate({
+      path: "info",
+      model: "userDetail",
+    });
+
+    if (user.info.saved_jobs.includes(jobId)) {
+      const temp = await UserDetail.findById({ _id: user.info._id }).populate({
+        path: "saved_jobs",
+        model: "job",
+        populate: {
+          path: "owner",
+          model: "user",
+          populate: {
+            path: "info",
+            model: "companyDetail",
+          },
+        },
+      });
+
+      temp.saved_jobs.pull({ _id: jobId });
+      await temp.save();
+
+      res.json({
+        status: "200",
+        message: "Successfully removed saved job!",
+        data: temp.saved_jobs,
+      });
+    }
+
+    res.json({ status: "400", message: "Error in saving job." });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
   newJob,
   fetchCreatedJobs,
@@ -199,4 +237,5 @@ module.exports = {
   editJob,
   deleteJob,
   addToSavedJobs,
+  removeSavedJob,
 };

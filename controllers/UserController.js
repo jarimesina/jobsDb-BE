@@ -62,7 +62,10 @@ const updateNormalUser = async (req, res, next) => {
           });
         }
       }
-    );
+    ).populate({
+      path: "saved_jobs",
+      model: "job",
+    });
   } catch (err) {
     console.log(err);
   }
