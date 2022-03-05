@@ -18,6 +18,13 @@ const getProfile = async (req, res, next) => {
         populate: {
           path: "saved_jobs",
           model: "job",
+          populate: {
+            path: "owner",
+            populate: {
+              path: "info",
+              model: "companyDetail",
+            },
+          },
         },
       });
     } else {
