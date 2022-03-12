@@ -174,15 +174,28 @@ const addToSavedJobs = async (req, res, next) => {
       model: "userDetail",
     });
 
-    if (!user.info.saved_jobs.includes(jobId)) {
-      const temp = await UserDetail.findById({ _id: user.info._id });
-
-      temp.saved_jobs.push(jobId);
-      await temp.save();
+    if (!user.info?.saved_jobs.includes(jobId)) {
+      const temp = await UserDetail.findByIdAndUpdate(
+        { _id: user?.info._id },
+        { $push: { saved_jobs: jobId } },
+        { upsert: true, returnDocument: "after" }
+      ).populate({
+        path: "saved_jobs",
+        model: "job",
+        populate: {
+          path: "owner",
+          model: "user",
+          populate: {
+            path: "info",
+            model: "companyDetail",
+          },
+        },
+      });
 
       res.json({
         status: "200",
         message: "Successfully saved job!",
+        data: temp.saved_jobs,
       });
     }
 
