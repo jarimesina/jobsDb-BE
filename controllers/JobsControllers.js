@@ -2,6 +2,7 @@ const Job = require("../model/job");
 const User = require("../model/user");
 const moment = require("moment");
 const UserDetail = require("../model/userDetails");
+const { sendEmail } = require("../services/sendgrid-service");
 
 const fetchCreatedJobs = async (req, res, next) => {
   try {
@@ -51,12 +52,14 @@ const newJob = async (req, res, next) => {
 const fetchJobs = async (req, res, next) => {
   try {
     let query = {};
-    if (req.query.programmingLanguage) {
-      query.languages = req.query.programmingLanguage;
+
+    const { skip, limit, programmingLanguage, dateRange } = req.query;
+    if (programmingLanguage) {
+      query.languages = programmingLanguage;
     }
 
-    if (req.query.dateRange) {
-      if (req.query.dateRange === "today") {
+    if (dateRange) {
+      if (dateRange === "today") {
         const today = new Date();
         const date =
           today.getFullYear() +
@@ -66,7 +69,7 @@ const fetchJobs = async (req, res, next) => {
           today.getDate();
 
         query.dateCreated = { $gte: date };
-      } else if (req.query.dateRange === "pastWeek") {
+      } else if (dateRange === "pastWeek") {
         const startOfWeek = moment().clone().startOf("week");
         const endOfWeek = moment().clone().endOf("week");
 
@@ -74,7 +77,7 @@ const fetchJobs = async (req, res, next) => {
           $gte: new Date(startOfWeek.toLocaleString()),
           $lte: new Date(endOfWeek.toLocaleString()),
         };
-      } else if (req.query.dateRange === "pastMonth") {
+      } else if (dateRange === "pastMonth") {
         const startOfMonth = moment().clone().startOf("month");
         const endOfMonth = moment().clone().endOf("month");
 
@@ -93,8 +96,8 @@ const fetchJobs = async (req, res, next) => {
           model: "companyDetail",
         },
       })
-      .skip(req.query.skip ? parseInt(req.query.skip) : 0)
-      .limit(req.query.limit ? parseInt(req.query.limit) : 10);
+      .skip(skip ? parseInt(skip) : 0)
+      .limit(limit ? parseInt(limit) : 10);
     const total = await Job.find(query).count();
     res.json({ data: { jobs: queryResult, total: total } });
   } catch (err) {
@@ -243,6 +246,29 @@ const removeSavedJob = async (req, res, next) => {
   }
 };
 
+const applyJob = async (req, res, next) => {
+  const { toEmail, jobId, userId } = req.body;
+
+  console.log("toEmail, jobId, userId", toEmail, jobId, userId);
+  try {
+    // add to set only adds item to field if it does not exist
+    const temp = await Job.findByIdAndUpdate(
+      { _id: jobId },
+      { $addToSet: { applicants: userId } },
+      { upsert: true, returnDocument: "after" }
+    );
+
+    await sendEmail(toEmail || "jarimesina1234@gmail.com");
+
+    res.json({
+      status: 200,
+      data: temp,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
   newJob,
   fetchCreatedJobs,
@@ -251,4 +277,5 @@ module.exports = {
   deleteJob,
   addToSavedJobs,
   removeSavedJob,
+  applyJob,
 };
