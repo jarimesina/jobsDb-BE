@@ -10,8 +10,6 @@ const jobSchema = new mongoose.Schema(
     // numberOfEmployees: { type: String, default: null },
     languages: { type: [String], default: null },
     image: { type: String, default: null },
-    // TODO: change this to timestamps true and remove dateCreated
-    dateCreated: { type: Date, default: new Date() },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

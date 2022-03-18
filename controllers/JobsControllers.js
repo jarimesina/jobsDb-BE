@@ -18,15 +18,8 @@ const fetchCreatedJobs = async (req, res, next) => {
 
 // newJob function for post job route
 const newJob = async (req, res, next) => {
-  const {
-    title,
-    responsibilities,
-    requirements,
-    location,
-    languages,
-    image,
-    dateCreated,
-  } = req.body;
+  const { title, responsibilities, requirements, location, languages, image } =
+    req.body;
 
   var job = new Job({
     title,
@@ -35,11 +28,9 @@ const newJob = async (req, res, next) => {
     location,
     languages,
     image,
-    dateCreated,
     owner: req.user.user_id,
   });
 
-  // console.log("help me", await Job.findById(job._id));
   // job.save((err) => {
   //   if (err) return handleError(err);
   // });
