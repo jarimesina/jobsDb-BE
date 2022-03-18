@@ -94,9 +94,9 @@ const updateUser = async (req, res, next) => {
 
     const user = await User.findOne(query);
 
-    const temp = user.info;
-    await CompanyDetail.findOneAndUpdate(
-      { _id: temp },
+    const tempId = user.info;
+    const data = await CompanyDetail.findOneAndUpdate(
+      { _id: tempId },
       {
         company_name,
         about,
@@ -105,21 +105,16 @@ const updateUser = async (req, res, next) => {
         industry,
         numberOfEmployees,
       },
-      (err, data) => {
-        if (err) {
-          res.json({ status: "500", message: "Error in updating company." });
-        } else {
-          console.log("success");
-          res.json({
-            status: "200",
-            message: "Successfully updated the company!",
-            data,
-          });
-        }
-      }
+      { returnDocument: "after" }
     );
+
+    res.json({
+      status: "200",
+      message: "Successfully saved job!",
+      data: data,
+    });
   } catch (err) {
-    console.log(err);
+    res.json({ status: "500", message: "Error in updating company." });
   }
 };
 

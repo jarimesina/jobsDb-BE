@@ -93,7 +93,19 @@ const fetchJobs = async (req, res, next) => {
         path: "owner",
         populate: {
           path: "info",
-          model: "companyDetail",
+          model: "userDetail",
+          populate: {
+            path: "saved_jobs",
+            model: "job",
+            populate: {
+              path: "owner",
+              model: "user",
+              populate: {
+                path: "info",
+                model: "companyDetail",
+              },
+            },
+          },
         },
       })
       .skip(skip ? parseInt(skip) : 0)
