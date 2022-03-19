@@ -18,5 +18,6 @@ router.post("/saveJob", jobController.addToSavedJobs);
 router.post("/removeSavedJob", jobController.removeSavedJob);
 
 router.post("/applyJob", jobController.applyJob);
+router.get("/appliedJobs", jobController.getAppliedJobs);
 
 module.exports = router; // export to use in server.js

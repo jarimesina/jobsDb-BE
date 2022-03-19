@@ -240,20 +240,48 @@ const removeSavedJob = async (req, res, next) => {
 const applyJob = async (req, res, next) => {
   const { toEmail, jobId, userId } = req.body;
 
-  console.log("toEmail, jobId, userId", toEmail, jobId, userId);
   try {
     // add to set only adds item to field if it does not exist
     const temp = await Job.findByIdAndUpdate(
       { _id: jobId },
       { $addToSet: { applicants: userId } },
       { upsert: true, returnDocument: "after" }
-    );
+    ).populate({
+      path: "owner",
+      model: "user",
+      populate: {
+        path: "info",
+        model: "companyDetail",
+      },
+    });
 
     await sendEmail(toEmail || "jarimesina1234@gmail.com");
 
     res.json({
       status: 200,
       data: temp,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const getAppliedJobs = async (req, res, next) => {
+  const { userId } = req.body;
+
+  try {
+    const appliedJobs = await Job.find({ applicants: userId }).populate({
+      path: "owner",
+      model: "user",
+      populate: {
+        path: "info",
+        model: "companyDetail",
+      },
+    });
+
+    res.json({
+      status: 200,
+      data: appliedJobs,
     });
   } catch (err) {
     console.log(err);
@@ -269,4 +297,5 @@ module.exports = {
   addToSavedJobs,
   removeSavedJob,
   applyJob,
+  getAppliedJobs,
 };
